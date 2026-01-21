@@ -101,11 +101,11 @@ router.get("/:recipeId", verifyToken, async(req, res)=>{
     
 })
 
-// Update specifict comment
+// Update specific comment
 router.put("/:recipeId/comments/:commentId", verifyToken, async(req,res)=>{
     try{
         if (!req.body.text) return res.status(400).json({ err: "text is required" });
-        
+
         const recipe = await Recipe.findById(req.params.recipeId)
         if(!recipe) return res.status(404).json({err:"Recipe not found"})
 
@@ -124,5 +124,27 @@ router.put("/:recipeId/comments/:commentId", verifyToken, async(req,res)=>{
     }
 })
 
+// Delete specific comment
+router.delete('/:recipeId/comments/:commentId', verifyToken, async (req,res)=>{
+    try{
+
+        const recipe = await Recipe.findById(req.params.recipeId);
+        if(!recipe) return res.status(404).json({err: "Recipe not found"})
+        
+        const deleteComment = recipe.comments.id(req.params.commentId)
+        if (!deleteComment) return res.status(404).json({err: "Comment not found"})
+        
+        if(deleteComment.author.toString()!==req.user._id){
+            return res.status(403).json({message:"You are not authorized to delete this comment"});
+        }
+        
+        deleteComment.deleteOne();
+        await recipe.save()
+        return res.status(200).json({message:"Comment deleted successfully"})
+    
+    }catch(err){
+        return res.status(500).json({err: err.message})
+    }
+})
 
 module.exports = router
