@@ -28,4 +28,15 @@ router.get("/", async(req,res)=>{
     }
 })
 
+// Get specific recipe
+router.get("/:recipeId", async(req,res)=>{
+    try{
+        // const recipe = await Recipe.findById(req.params.recipeId).populate("author");
+        const recipe = await Recipe.findById(req.params.recipeId);
+        res.status(200).json(recipe);
+    }catch (err){
+        res.status(500).json({err: err.message})
+    }
+})
+
 module.exports = router
