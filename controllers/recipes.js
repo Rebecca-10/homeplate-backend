@@ -101,7 +101,28 @@ router.get("/:recipeId", verifyToken, async(req, res)=>{
     
 })
 
+// Update specifict comment
+router.put("/:recipeId/comments/:commentId", verifyToken, async(req,res)=>{
+    try{
+        if (!req.body.text) return res.status(400).json({ err: "text is required" });
+        
+        const recipe = await Recipe.findById(req.params.recipeId)
+        if(!recipe) return res.status(404).json({err:"Recipe not found"})
 
+        const comment = recipe.comments.id(req.params.commentId);
+        if(!comment) return res.status(404).json({err: "Comment not found"})
+
+        if (comment.author.toString()!== req.user._id){
+            return res.status(403).json({message:"You are not authorized to edit this comment"});
+        }
+
+        comment.text = req.body.text;
+        await recipe.save();
+        res.status(200).json(comment)
+    }catch(err){
+        res.status(500).send({err: err.message})
+    }
+})
 
 
 module.exports = router
