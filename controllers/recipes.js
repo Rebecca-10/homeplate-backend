@@ -110,6 +110,29 @@ router.get("/:recipeId", verifyToken, async(req, res)=>{
     
 })
 
+router.post("/:recipeId/likes", verifyToken, async(req,res)=>{
+    try{
+        const recipe = await Recipe.findById(req.params.recipeId)
+        const userId = req.user._id
+        if(!recipe) return res.status(404).json({err: "Recipe not found"})
+            
+        const alreadyLiked = recipe.likes.some(id => id.toString()=== userId.toString())
+        
+        if(!alreadyLiked){
+            recipe.likes.push(userId);
+            await recipe.save()
+        }
+
+        return res.status(200).json({
+            recipeId: recipe._id,
+            likesCount: recipe.likes.length,
+            liked:true
+        })
+    }catch(err){
+        res.status(500).send({err: err.message})
+    }
+})
+
 // Update specific comment
 router.put("/:recipeId/comments/:commentId", verifyToken, async(req,res)=>{
     try{
