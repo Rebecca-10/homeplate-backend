@@ -5,11 +5,20 @@ const User = require('../models/user');
 const Follow = require('../models/follow')
 
 const verifyToken = require('../middleware/verify-token');
+const { populate } = require('../models/recipe');
+
+const getFollowList = async ({filter, populateField}) =>{
+  const follows = await Follow.find(filter).populate(populateField, 'username');
+
+  return follows.map(follow => follow[populateField])
+}
 
 const getFollowingList = async (userId) =>{
-  const following = await Follow.find({follower: userId}).populate('following','username')
-  
-  return following.map((follow) => follow.following) 
+  const filter = {follower:userId}
+  const populateField = 'following'
+
+  const following = getFollowList({filter,populateField})
+  return following
 }
 
 
