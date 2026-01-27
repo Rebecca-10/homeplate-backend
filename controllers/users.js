@@ -43,7 +43,7 @@ router.post('/:userId/follow',verifyToken,async(req,res)=>{
       return res.status(400).json({err: "You cannot follow yourself"})
     }
     
-    const follow = await Follow.create({
+    await Follow.create({
       follower:followerId,
       following: followingId
     })
