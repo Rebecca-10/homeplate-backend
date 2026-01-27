@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const User = require('../models/user');
+const Follow = require('../models/follow')
 
 const verifyToken = require('../middleware/verify-token');
 
@@ -32,5 +33,29 @@ router.get('/:userId', verifyToken, async (req, res) => {
     res.status(500).json({ err: err.message });
   }
 });
+
+router.post('/:userId/follow',verifyToken,async(req,res)=>{
+  try{
+    const followerId= req.user._id;
+    const followingId = req.params.userId;
+    
+    if(followerId.toString()=== followingId.toString()){
+      return res.status(400).json({err: "You cannot follow yourself"})
+    }
+    
+    const follow = await Follow.create({
+      follower:followerId,
+      following: followingId
+    })
+    
+    return res.status(200).json({
+      follower:followerId,
+      following: followingId
+    })
+  }catch(err){
+    res.status(500).json({err: err.message})
+  }
+})
+
 
 module.exports = router;
