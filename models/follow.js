@@ -17,11 +17,10 @@ const followSchema = new mongoose.Schema({
 
 followSchema.index({follower: 1, following:1 }, {unique:true})
 
-followSchema.pre("validate", function (next){
+followSchema.pre("validate", function (){
     if(this.follower?.toString()=== this.following?.toString()){
-        return next(new Error("Users cannot follow themselves"))
+        this.invalidate("following", "Users cannot follow themselves")
     }
-    next();
 })
 
 module.exports = mongoose.model('Follow', followSchema)
