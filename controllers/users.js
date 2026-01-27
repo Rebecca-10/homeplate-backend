@@ -6,6 +6,13 @@ const Follow = require('../models/follow')
 
 const verifyToken = require('../middleware/verify-token');
 
+const getFollowingList = async (userId) =>{
+  const following = await Follow.find({follower: userId}).populate('following','username')
+  
+  return following.map((follow) => follow.following) 
+}
+
+
 router.get('/', verifyToken, async (req, res) => {
   try {
     const users = await User.find({}, "username");
@@ -60,15 +67,14 @@ router.post('/:userId/follow',verifyToken,async(req,res)=>{
 router.get('/:userId/following', verifyToken, async(req,res)=>{
   try{
     const userId = req.params.userId;
-    const following = await Follow.find({follower: userId}).populate('following','username')
-    
-    const followingList = following.map((follow) => follow.following)
-    return res.status(200).json({followingList})
+    const following = await getFollowingList(userId)
+    return res.status(200).json({following})
 
   }catch(err){
     return res.status(500).json({err:err.message})
   }
 })
+
 
 
 module.exports = router;
