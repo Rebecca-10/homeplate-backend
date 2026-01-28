@@ -15,6 +15,7 @@ const recipeRouter = require('./controllers/recipes');
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI);
+const PORT = process.env.PORT
 
 mongoose.connection.on('connected', () => {
   console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
@@ -31,6 +32,6 @@ app.use('/users', usersRouter);
 app.use('/recipes',recipeRouter);
 
 // Start the server and listen on port 3000
-app.listen(3000, () => {
+app.listen(PORT, () => {
   console.log('The express app is ready!');
 });
